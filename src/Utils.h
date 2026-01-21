@@ -6,6 +6,7 @@
 
 #include "Constants.h"
 
+
 //using Vec3f = Eigen::Vector3f;
 using Vec3d = Eigen::Vector3d;
 using Vec4f = Eigen::Vector4f;

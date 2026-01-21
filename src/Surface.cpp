@@ -1,7 +1,5 @@
 #include "Surface.h"
 
-#include "Test.h"
-
 void Surface::Set(PointCloud::Ptr cloud, Visual::Ptr viewer)
 {
 	m_cloud = cloud;
@@ -42,7 +40,7 @@ SurfacePoint Surface::LiftToSurface(Vec3d point, double z_guess) const
 	const double z0 = std::isnan(z_guess) ? m_centroid.z() : z_guess;
 
 	// Query point for neighbor search (3D KD-tree); z is only a bias
-	Point3 q{ (float)point.x(), (float)point.y(), (float)z0 };
+	Point3 q{ static_cast<float>(point.x()), static_cast<float>(point.y()), static_cast<float>(z0) };
 
 	std::vector<int> indices(KD_TREE_K_CLOSEST);
 	std::vector<float> sqr_dist(KD_TREE_K_CLOSEST);
@@ -80,7 +78,7 @@ SurfacePoint Surface::LiftToSurface(Vec3d point, double z_guess) const
 		n = -n;
 
 	// --- XY-preserving lift: solve plane equation for z ---
-	// Plane through centroid with normal n: n · (X - centroid) = 0
+	// Plane through centroid with normal n: n ï¿½ (X - centroid) = 0
 	const double x = point.x();
 	const double y = point.y();
 	const double nz = n.z();

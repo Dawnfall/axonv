@@ -6,58 +6,16 @@
       "displayName": "axonv (Ninja + vcpkg)",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}",
-      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
     }
   ],
   "buildPresets": [
     {
       "name": "axonv",
       "configurePreset": "axonv"
-    }
-  ]
-}
-
-
-
-
-{
-  "version": 3,
-  "cmakeMinimumRequired": {
-    "major": 3,
-    "minor": 23,
-    "patch": 0
-  },
-  "configurePresets": [
-    {
-      "name": "base",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-      }
-    },
-    {
-      "name": "linux-ninja",
-      "displayName": "Linux (Ninja + vcpkg)",
-      "inherits": "base",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/linux-ninja"
-    },
-    {
-      "name": "windows-ninja",
-      "displayName": "Windows (Ninja + vcpkg)",
-      "inherits": "base",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/windows-ninja"
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "linux-ninja",
-      "configurePreset": "linux-ninja"
-    },
-    {
-      "name": "windows-ninja",
-      "configurePreset": "windows-ninja"
     }
   ]
 }

@@ -8,7 +8,6 @@
 inline SurfacePath TestNRows(const Surface& surface, const ConvexHull& hull, double lineOffset, int n)
 {
 	SurfacePath path;
-
 	double trajectoryStep = lineOffset / 3.0f;
 	SurfaceRow row = surface.ElevateEdge(hull.GetLongestEdge(), trajectoryStep);
 	path.emplace_back(row);

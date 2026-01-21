@@ -1,2 +1,7 @@
 build/
 .vs/
+.vscode/
+
+.clangd
+.cache/
+compile_commands.json

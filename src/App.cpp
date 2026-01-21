@@ -47,6 +47,7 @@ App::App()
 					m_viewer->updatePointCloud<Point3>(m_selectedPoints, *m_selectedPointsHandler, SELECTED_CLOUD_ID);
 
 					m_path.Clear(m_viewer);
+					m_path.Update(m_viewer);
 				}
 				else if (event.getKeySym() == "c")
 				{
