@@ -13,7 +13,7 @@ void Surface::Set(PointCloud::Ptr cloud, Visual::Ptr viewer)
 	viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, SURFACE_POINT_SIZE, SURFACE_CLOUD_ID);
 }
 
-SurfacePath Surface::CalculateSurfacePath(const ConvexHull& convexHull,double lineOffset)
+SurfacePath Surface::CalculateSurfacePath(const ConvexHull& convexHull,double lineOffset)const
 {
 	SurfacePath path;
 
@@ -34,7 +34,7 @@ SurfacePath Surface::CalculateSurfacePath(const ConvexHull& convexHull,double li
 }
 
 // Project (x,y) to the surface and estimate normal using local plane fitting.
-SurfacePoint Surface::LiftToSurface(Vec3d point, double z_guess) const
+SurfacePoint Surface::LiftToSurface(const Vec3d& point, double z_guess) const
 {
 	// If caller didn't provide a z guess, fall back to cloud centroid z
 	const double z0 = std::isnan(z_guess) ? m_centroid.z() : z_guess;
@@ -73,26 +73,21 @@ SurfacePoint Surface::LiftToSurface(Vec3d point, double z_guess) const
 	Vec3d n = es.eigenvectors().col(0);
 	n.normalize();
 
-	// Enforce consistent orientation (height-field assumption)
+	// Enforce consistent orientation
 	if (n.z() < 0.f)
 		n = -n;
 
-	// --- XY-preserving lift: solve plane equation for z ---
-	// Plane through centroid with normal n: n � (X - centroid) = 0
 	const double x = point.x();
 	const double y = point.y();
 	const double nz = n.z();
 
-	// Under your assumptions, nz should not be near 0.
-	// If you still want a minimal guard without "edge case clutter", you can assert:
-	// assert(std::abs(nz) > 1e-6f);
-
+	//solve for z
 	const double z = centroid.z() - (n.x() * (x - centroid.x()) + n.y() * (y - centroid.y())) / nz;
 
 	return SurfacePoint{ Vec3d{x, y, z}, n };
 }
 
-SurfacePoint Surface::GetNextAlong2DPath(const SurfacePoint& p, Vec3d dirXY, double stepSize)const
+SurfacePoint Surface::GetNextAlong2DPath(const SurfacePoint& p, const Vec3d& dirXY, double stepSize)const
 {
 	Vec3d dirProjOnNormal = dirXY.dot(p.Normal) * p.Normal;
 	Vec3d dirTrajectory = (dirXY - dirProjOnNormal).normalized();

@@ -21,10 +21,10 @@ class Surface
 {
 public:
 	void Set(PointCloud::Ptr cloud,  Visual::Ptr viewer);
-	SurfacePath CalculateSurfacePath(const ConvexHull& hull, double lineOffset);
+	SurfacePath CalculateSurfacePath(const ConvexHull& hull, double lineOffset)const;
 
-	SurfacePoint LiftToSurface(Vec3d point, double z_guess = std::numeric_limits<double>::quiet_NaN())const;
-	SurfacePoint GetNextAlong2DPath(const SurfacePoint& p, Vec3d dirXY, double stepSize)const;
+	SurfacePoint LiftToSurface(const Vec3d& point, double z_guess = std::numeric_limits<double>::quiet_NaN())const;
+	SurfacePoint GetNextAlong2DPath(const SurfacePoint& p, const Vec3d& dirXY, double stepSize)const;
 	SurfacePoint GetNextRowPoint(const SurfacePoint& p, const Vec3d& tangent, double offset, double crossProductSignage)const;
 
 	SurfaceRow GetNextRowPath(const SurfaceRow& row, const ConvexHull& hull, double lineOffset, double crossProductSignage)const;
