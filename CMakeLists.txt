@@ -1,12 +1,12 @@
-cmake_minimum_required(VERSION 3.5)
-project(axonv_task LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.2)
+project(axonv_task LANGUAGES C CXX)
 
 add_executable(axonv 
 "src/main.cpp"
 "src/App.cpp"
 "src/Surface.cpp"
 "src/ConvexHull.cpp"
- "src/Path.h")
+)
 
 #add_executable(axonv ${AXONV_SOURCES})
 target_compile_features(axonv PRIVATE cxx_std_17)
