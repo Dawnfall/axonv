@@ -19,6 +19,13 @@ search
 kdtree
 )
 
+add_custom_command(
+  TARGET axonv POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+          ${CMAKE_SOURCE_DIR}/data
+          $<TARGET_FILE_DIR:axonv>/data
+)
+
 #target_include_directories(axonv PRIVATE ${PCL_INCLUDE_DIRS})
 
 target_compile_definitions(axonv PRIVATE PCL_NO_PRECOMPILE)

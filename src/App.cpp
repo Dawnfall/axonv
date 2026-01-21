@@ -67,10 +67,17 @@ void App::Init(const std::string& pcPath, double lineOffset)
 {
 	m_lineOffset = lineOffset;
 
-	PointCloud::Ptr pointCloud = std::make_shared<PointCloud>();
-	if (pcl::io::loadPCDFile<Point3>(pcPath, *pointCloud) < 0)
+	PointCloud::Ptr pointCloud = nullptr;
+	
+	if(pcPath == "random")
+		pointCloud = CreateSomePointCloud(100,100,0.1f,0.1f);
+	else
 	{
-		throw std::runtime_error("Failed to load PCD file: " + pcPath);
+		pointCloud = std::make_shared<PointCloud>();
+		if (pcl::io::loadPCDFile<Point3>(pcPath, *pointCloud) < 0)
+		{
+			throw std::runtime_error("Failed to load PCD file: " + pcPath);
+		}
 	}
 
 	m_surface.Set(pointCloud, m_viewer);
