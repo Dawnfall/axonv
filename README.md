@@ -5,9 +5,14 @@
 
 ```
 cmake --preset axonv
-cmake --build --preset axonv
+cmake --build --[option] axonv
 ./build/axonv/axonv [arguments]
 ```
+
+## Preset option
+ 
+ - debug
+ - release
 
 ## Arguments
 

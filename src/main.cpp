@@ -19,7 +19,6 @@
 //      - from normal and tangent calculate offset vector
 //      - fit that offset point to the plane
 //      - if point outside of convex hull discard it
-//      - if next row wider on any side->extend it
 //      - once next row has no points->break
 //end result are zig zag lines where 3D distances are 
 
