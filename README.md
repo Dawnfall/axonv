@@ -4,9 +4,9 @@
  - uses CMAKE with presets & VCPKG for PCL, VCPKG_ROOT must be set
 
 ```
-cmake --preset axonv
-cmake --build --[option] axonv
-./build/axonv/axonv [arguments]
+cmake --preset [option]
+cmake --build --preset [option]
+./build/[option]/axonv [arguments]
 ```
 
 ## Preset option
