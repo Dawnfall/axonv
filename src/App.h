@@ -1,6 +1,4 @@
 #pragma once
-//#include "Constants.h"
-//#include "ConvexHull.h"
 #include "Utils.h"
 #include "Surface.h"
 #include "Path.h"
@@ -18,11 +16,9 @@ private:
 
 	Visual::Ptr m_viewer = nullptr;
 
+	ConvexHull m_hull;
 	Surface m_surface;
 	Path m_path;
-
-	PointCloud::Ptr m_selectedPoints = nullptr;
-	PcColorHandlerCustom::Ptr m_selectedPointsHandler = nullptr;
 
 	float m_lineOffset = 0.01f;
 };

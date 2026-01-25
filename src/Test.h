@@ -4,9 +4,9 @@
 #include "ConvexHull.h"
 #include "Surface.h"
 
-inline PointCloud::Ptr CreateSomePointCloud(int nX, int nY, float dX, float dY)
+inline PointCloud3::Ptr CreateSomePointCloud(int nX, int nY, float dX, float dY)
 {
-    auto cloud = std::make_shared<PointCloud>();
+    auto cloud = std::make_shared<PointCloud3>();
     cloud->points.reserve(static_cast<std::size_t>(nX) * static_cast<std::size_t>(nY));
 
     for (int j = 0; j < nY; ++j) 
