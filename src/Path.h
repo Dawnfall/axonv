@@ -7,7 +7,7 @@ public:
 
 	inline void Init(Visual::Ptr viewer)
 	{
-		m_pathCloud = std::make_shared<PointCloud>();
+		m_pathCloud = std::make_shared<PointCloud3>();
 		m_pathHandler = std::make_shared<PcColorHandlerCustom>(m_pathCloud, GRAY_COLOR.x(), GRAY_COLOR.y(), GRAY_COLOR.z());
 		m_normalCloud = std::make_shared<pcl::PointCloud<pcl::Normal>>();
 
@@ -55,7 +55,7 @@ public:
 
 private:
 
-	PointCloud::Ptr m_pathCloud;
+	PointCloud3::Ptr m_pathCloud;
 	pcl::PointCloud<pcl::Normal>::Ptr m_normalCloud;
 	PcColorHandlerCustom::Ptr m_pathHandler = nullptr;
 };

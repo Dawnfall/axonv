@@ -1,37 +1,84 @@
 {
-  "version": 3,
+  "version": 5,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
   "configurePresets": [
     {
-      "name": "debug",
-      "displayName": "debug (Ninja + vcpkg)",
+      "name": "base",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+
+    {
+      "name": "linux-debug",
+      "displayName": "Linux Debug (Ninja + vcpkg)",
+      "inherits": "base",
+      "condition": {
+        "type": "notEquals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+        "VCPKG_TARGET_TRIPLET": "x64-linux"
       }
     },
     {
-      "name": "release",
-      "displayName": "release (Ninja + vcpkg)",
+      "name": "linux-release",
+      "displayName": "Linux Release (Ninja + vcpkg)",
+      "inherits": "base",
+      "condition": {
+        "type": "notEquals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+        "VCPKG_TARGET_TRIPLET": "x64-linux"
+      }
+    },
+
+    {
+      "name": "win-vs2026",
+      "displayName": "Windows VS 2026 (vcpkg)",
+      "inherits": "base",
+      "generator": "Visual Studio 18 2026",
+      "binaryDir": "${sourceDir}/build/vs",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "D:/Programiranje/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "x64-windows"
       }
     }
   ],
   "buildPresets": [
     {
-      "name": "debug",
-      "configurePreset": "debug"
+      "name": "linux-debug",
+      "configurePreset": "linux-debug"
     },
     {
-      "name": "release",
-      "configurePreset": "release"
+      "name": "linux-release",
+      "configurePreset": "linux-release"
+    },
+    {
+      "name": "win-debug",
+      "configurePreset": "win-vs2026",
+      "configuration": "Debug"
+    },
+    {
+      "name": "win-release",
+      "configurePreset": "win-vs2026",
+      "configuration": "Release"
     }
   ]
 }

@@ -48,7 +48,7 @@ struct LinePolyHit
 class ConvexHull
 {
 public:
-	ConvexHull(PointCloud::Ptr areaPoints);
+	ConvexHull(PointCloud3::Ptr areaPoints);
 
 	double convexHull2DSignedArea()const;
 	Edge GetLongestEdge()const;
@@ -57,6 +57,4 @@ public:
 
 private:
 	std::vector<Vec3d> m_polygon;
-
-
 };

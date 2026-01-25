@@ -12,7 +12,7 @@ App::App()
 	m_viewer = std::make_shared<Visual>("AxonV");
 	m_viewer->setBackgroundColor(BG_COLOR.x(), BG_COLOR.y(), BG_COLOR.z());
 
-	m_selectedPoints = std::make_shared<PointCloud>();
+	m_selectedPoints = std::make_shared<PointCloud3>();
 	m_selectedPointsHandler = std::make_shared<PcColorHandlerCustom>(m_selectedPoints, RED_COLOR.x(), RED_COLOR.y(), RED_COLOR.z());
 
 	m_viewer->addPointCloud(m_selectedPoints, *m_selectedPointsHandler, SELECTED_CLOUD_ID);
@@ -22,18 +22,19 @@ App::App()
 
 	//m_viewer->initCameraParameters();
 	//m_viewer->resetCamera();
-	m_viewer->registerPointPickingCallback(
-		[this](const pcl::visualization::PointPickingEvent& e)
+	m_viewer->registerPointPickingCallback([this](const pcl::visualization::PointPickingEvent& e)
 		{
-			int idx = e.getPointIndex();
-			if (idx == -1)
-				return; // nothing picked
+			if (int idx = e.getPointIndex(); idx == -1) // nothing picked
+				return; 
+			if (std::string name = e.getCloudName(); name == SELECTED_CLOUD_ID)
+				return;
 
 			float x, y, z;
 			e.getPoint(x, y, z);
 
 			m_selectedPoints->push_back(Point3{ x, y, z });
 			std::cout << x << " " << y << " " << z << std::endl;
+
 			m_viewer->updatePointCloud(m_selectedPoints, *m_selectedPointsHandler, SELECTED_CLOUD_ID);
 		});
 
@@ -67,13 +68,12 @@ void App::Init(const std::string& pcPath, double lineOffset)
 {
 	m_lineOffset = lineOffset;
 
-	PointCloud::Ptr pointCloud = nullptr;
-	
-	if(pcPath == "random")
-		pointCloud = CreateSomePointCloud(100,100,0.1f,0.1f);
+	PointCloud3::Ptr pointCloud = nullptr;
+	if (pcPath == "random")
+		pointCloud = CreateSomePointCloud(100, 100, 0.1f, 0.1f);
 	else
 	{
-		pointCloud = std::make_shared<PointCloud>();
+		pointCloud = std::make_shared<PointCloud3>();
 		if (pcl::io::loadPCDFile<Point3>(pcPath, *pointCloud) < 0)
 		{
 			throw std::runtime_error("Failed to load PCD file: " + pcPath);

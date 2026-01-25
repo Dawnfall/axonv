@@ -21,7 +21,8 @@ private:
 	Surface m_surface;
 	Path m_path;
 
-	PointCloud::Ptr m_selectedPoints = nullptr;
+	std::vector<Point3> m_selectedPts;
+	PointCloud3::Ptr m_selectedPoints = nullptr;
 	PcColorHandlerCustom::Ptr m_selectedPointsHandler = nullptr;
 
 	float m_lineOffset = 0.01f;

@@ -8,6 +8,13 @@
 
 #include "ConvexHull.h"
 
+struct Point2D
+{
+	float x;
+	float y;
+	int index;
+};
+
 struct SurfacePoint
 {
 	Vec3d Pos;
@@ -20,10 +27,10 @@ using SurfacePath = std::vector<SurfaceRow>;
 class Surface
 {
 public:
-	void Set(PointCloud::Ptr cloud,  Visual::Ptr viewer);
+	void Set(PointCloud3::Ptr cloud,  Visual::Ptr viewer);
 	SurfacePath CalculateSurfacePath(const ConvexHull& hull, double lineOffset)const;
 
-	SurfacePoint LiftToSurface(const Vec3d& point, double z_guess = std::numeric_limits<double>::quiet_NaN())const;
+	SurfacePoint LiftToSurface(const Vec3d& point)const;
 	SurfacePoint GetNextAlong2DPath(const SurfacePoint& p, const Vec3d& dirXY, double stepSize)const;
 	SurfacePoint GetNextRowPoint(const SurfacePoint& p, const Vec3d& tangent, double offset, double crossProductSignage)const;
 
@@ -33,10 +40,10 @@ public:
 	SurfaceRow ElevateEdge2(const Edge& edge, double stepSize)const;
 
 private:
-	PointCloud::ConstPtr m_cloud;
-	pcl::KdTreeFLANN<Point3> m_kdTree;
-	Vec4f m_centroid; // cached (used as z-guess fallback)
-
+	PointCloud3::ConstPtr m_cloud;
 	PCColorHandler::Ptr m_pcHandler = nullptr;
+
+	PointCloud2::Ptr m_cloud2D;
+	KDTree2 m_kdTree2D;
 };
 

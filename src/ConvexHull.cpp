@@ -3,20 +3,13 @@
 #include <pcl/surface/convex_hull.h>
 
 // Returns convex hull polygon in XY as CCW , assumes its a valid area
-ConvexHull::ConvexHull(PointCloud::Ptr areaPoints)
+ConvexHull::ConvexHull(PointCloud3::Ptr areaPoints)
 {
-	//PointCloud::Ptr temp2DCloud = std::make_shared<PointCloud>();
-	//temp2DCloud->reserve(areaPoints->size());
-	//for (const auto& p : areaPoints->points)
-	//	if (pcl::isFinite(p))
-	//		temp2DCloud->push_back(Point3{ p.x,p.y,0.0f });
-
-	// Compute 2D hull
 	pcl::ConvexHull<Point3> hull;
 	hull.setInputCloud(areaPoints);
 	hull.setDimension(2);
 
-	PointCloud hullPoints;
+	PointCloud3 hullPoints;
 	std::vector<pcl::Vertices> hullPolygons;
 	hull.reconstruct(hullPoints, hullPolygons);
 

@@ -1,13 +1,20 @@
 #include "Surface.h"
 
-void Surface::Set(PointCloud::Ptr cloud, Visual::Ptr viewer)
+#include <algorithm>
+
+void Surface::Set(PointCloud3::Ptr cloud, Visual::Ptr viewer)
 {
 	m_cloud = cloud;
 
 	m_pcHandler = std::make_shared<PCColorHandler>(m_cloud, "z");
 
-	m_kdTree.setInputCloud(cloud); 
-	pcl::compute3DCentroid(*cloud, m_centroid);
+	//m_kdTree.setInputCloud(cloud); 
+
+	m_cloud2D = std::make_shared<PointCloud2>();
+	m_cloud2D->reserve(m_cloud->size());
+	for (const auto& p : m_cloud->points)
+		m_cloud2D->push_back(ToPoint2(p));
+	m_kdTree2D.setInputCloud(m_cloud2D);
 
 	viewer->addPointCloud<Point3>(m_cloud, *m_pcHandler, SURFACE_CLOUD_ID);
 	viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, SURFACE_POINT_SIZE, SURFACE_CLOUD_ID);
@@ -33,18 +40,18 @@ SurfacePath Surface::CalculateSurfacePath(const ConvexHull& convexHull,double li
 	return path;
 }
 
-// Project (x,y) to the surface and estimate normal using local plane fitting.
-SurfacePoint Surface::LiftToSurface(const Vec3d& point, double z_guess) const
+//PCA algorithm
+SurfacePoint Surface::LiftToSurface(const Vec3d& point) const
 {
-	// If caller didn't provide a z guess, fall back to cloud centroid z
-	const double z0 = std::isnan(z_guess) ? m_centroid.z() : z_guess;
+	std::vector<int> indices;
+	indices.reserve(KD_TREE_K_CLOSEST);
+	std::vector<float> sqrDist;
+	sqrDist.reserve(KD_TREE_K_CLOSEST);
 
-	// Query point for neighbor search (3D KD-tree); z is only a bias
-	Point3 q{ static_cast<float>(point.x()), static_cast<float>(point.y()), static_cast<float>(z0) };
+	Point2 point2D = ToPoint2(point);
 
-	std::vector<int> indices(KD_TREE_K_CLOSEST);
-	std::vector<float> sqr_dist(KD_TREE_K_CLOSEST);
-	m_kdTree.nearestKSearch(q, KD_TREE_K_CLOSEST, indices, sqr_dist);
+	//m_kdTree2D.radiusSearch(point2D, radius, indices, sqrDist); //switch to radius maybe
+	m_kdTree2D.nearestKSearch(point2D, KD_TREE_K_CLOSEST, indices, sqrDist);
 
 	// --- centroid of neighbors ---
 	Vec3d centroid(0.0, 0.0, 0.0);
@@ -77,12 +84,38 @@ SurfacePoint Surface::LiftToSurface(const Vec3d& point, double z_guess) const
 	if (n.z() < 0.f)
 		n = -n;
 
-	const double x = point.x();
-	const double y = point.y();
-	const double nz = n.z();
+	double x = point.x();
+	double y = point.y();
+	double nz = n.z();
 
 	//solve for z
-	const double z = centroid.z() - (n.x() * (x - centroid.x()) + n.y() * (y - centroid.y())) / nz;
+	//double z = centroid.z() - (n.x() * (x - centroid.x()) + n.y() * (y - centroid.y())) / nz;
+
+	double z;
+	if (std::abs(nz) > 1e-2) //problems if nz is close to 0...we switch to least squares
+	{
+		z = centroid.z() - (n.x() * (x - centroid.x()) + n.y() * (y - centroid.y())) / nz;
+	}
+	else
+	{
+		// Least squares z = ax + by + c
+		Eigen::MatrixXd A(indices.size(), 3);
+		Eigen::VectorXd b(indices.size());
+
+		for (size_t i = 0; i < indices.size(); ++i)
+		{
+			const auto& p = (*m_cloud)[indices[i]];
+			A(i, 0) = p.x;
+			A(i, 1) = p.y;
+			A(i, 2) = 1.0;
+			b(i) = p.z;
+		}
+
+		Eigen::Vector3d abc = A.colPivHouseholderQr().solve(b);
+		z = abc[0] * x + abc[1] * y + abc[2];
+	}
+
+
 
 	return SurfacePoint{ Vec3d{x, y, z}, n };
 }
@@ -102,7 +135,7 @@ SurfacePoint Surface::GetNextRowPoint(const SurfacePoint& p, const Vec3d& tangen
 	Vec3d moveDir = tangent.cross(p.Normal).normalized() * crossProductSignage; // cross product will alternate row to row
 	Vec3d newPos = p.Pos + moveDir * offset;
 
-	return LiftToSurface(newPos, newPos.z());
+	return LiftToSurface(newPos);
 }
 
 SurfaceRow Surface::GetNextRowPath(const SurfaceRow& row, const ConvexHull& hull, double lineOffset, double crossProductSignage)const
@@ -170,7 +203,7 @@ SurfaceRow Surface::ElevateEdge2(const Edge& edge, double stepSize)const //bad w
 		if (distanceXY > totalLenXY)
 			break;
 
-		row.push_back(LiftToSurface(nextPoint, nextPoint.z()));
+		row.push_back(LiftToSurface(nextPoint));
 	}
 	return row;
 }
