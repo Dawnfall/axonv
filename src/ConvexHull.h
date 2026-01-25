@@ -42,19 +42,22 @@ struct LinePolyHit
 	Vec3d p0, p1;
 };
 
-//points are 3D but z == 0 
-//polygon is CCW
-
 class ConvexHull
 {
 public:
-	ConvexHull(PointCloud3::Ptr areaPoints);
+	ConvexHull();
+
+	void Prepare();
 
 	double convexHull2DSignedArea()const;
 	Edge GetLongestEdge()const;
-	LinePolyHit IntersectLineConvexHull(const Line& line)const;
 	bool PointInConvexPolygonCCW(const Vec3d& p)const;
 
+	void SelectPoint(const Point3& point, Visual::Ptr viewer);
+	void Clear(Visual::Ptr viewer);
+
 private:
+
 	std::vector<Vec3d> m_polygon;
+	PointCloud3::Ptr m_selectedPoints = nullptr;
 };

@@ -8,8 +8,6 @@ void Surface::Set(PointCloud3::Ptr cloud, Visual::Ptr viewer)
 
 	m_pcHandler = std::make_shared<PCColorHandler>(m_cloud, "z");
 
-	//m_kdTree.setInputCloud(cloud); 
-
 	m_cloud2D = std::make_shared<PointCloud2>();
 	m_cloud2D->reserve(m_cloud->size());
 	for (const auto& p : m_cloud->points)
@@ -88,34 +86,7 @@ SurfacePoint Surface::LiftToSurface(const Vec3d& point) const
 	double y = point.y();
 	double nz = n.z();
 
-	//solve for z
-	//double z = centroid.z() - (n.x() * (x - centroid.x()) + n.y() * (y - centroid.y())) / nz;
-
-	double z;
-	if (std::abs(nz) > 1e-2) //problems if nz is close to 0...we switch to least squares
-	{
-		z = centroid.z() - (n.x() * (x - centroid.x()) + n.y() * (y - centroid.y())) / nz;
-	}
-	else
-	{
-		// Least squares z = ax + by + c
-		Eigen::MatrixXd A(indices.size(), 3);
-		Eigen::VectorXd b(indices.size());
-
-		for (size_t i = 0; i < indices.size(); ++i)
-		{
-			const auto& p = (*m_cloud)[indices[i]];
-			A(i, 0) = p.x;
-			A(i, 1) = p.y;
-			A(i, 2) = 1.0;
-			b(i) = p.z;
-		}
-
-		Eigen::Vector3d abc = A.colPivHouseholderQr().solve(b);
-		z = abc[0] * x + abc[1] * y + abc[2];
-	}
-
-
+	double z = centroid.z() - (n.x() * (x - centroid.x()) + n.y() * (y - centroid.y())) / nz;
 
 	return SurfacePoint{ Vec3d{x, y, z}, n };
 }
